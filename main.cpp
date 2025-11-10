@@ -25,12 +25,12 @@ int main()
     }
     if (std::cin.fail() && !std::cin.eof()) {
       return 1;
-    } else if (std::cin.eof()) {
-      return 1;
     }
 
     size_t count = 1ull;
-
+    if (!a.last()) {
+      return 2;
+    }
     for (size_t i = 0ull; i < a.size() - 1; ++i) {
       int d = a.get(i);
       count += !(d % a.last());
@@ -71,7 +71,7 @@ void IntArray::add(int i)
 {
   int * temp = new int[size() + 1];
   for (size_t j = 0; j < size(); ++j) {
-    temp[j] = get(i);
+    temp[j] = get(j);
   }
   temp[size()] = i;
   delete[] data;
