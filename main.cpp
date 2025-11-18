@@ -10,14 +10,14 @@ namespace alekseev {
     IntArray(const IntArray & rhs);
     ~IntArray();
     IntArray & operator=(IntArray const & rhs);
-    size_t get_size() const;
-    bool empty() const;
+    size_t get_size() const noexcept;
+    bool empty() const noexcept;
     void add_front(int i);
     void add_back(int i);
     void insert(size_t id, int i);
     int get(size_t id) const;
-    int get_front() const;
-    int get_back() const;
+    int get_front() const noexcept;
+    int get_back() const noexcept;
     void set(size_t id, int i);
     void del(size_t id);
     int pop_back();
@@ -26,36 +26,41 @@ namespace alekseev {
   };
 }
 
+
 int main()
 {
-
 }
 
-alekseev::IntArray::IntArray() : data(nullptr),
-                                 size(0)
+
+alekseev::IntArray::IntArray(): data(nullptr),
+                                size(0)
 {
 }
 
-alekseev::IntArray::IntArray(size_t k, int v) : size(k),
-                                                data(new int[get_size()])
+
+alekseev::IntArray::IntArray(size_t k, int v): size(k),
+                                               data(new int[get_size()])
 {
   for (size_t i = 0ull; i < size; ++i) {
     data[i] = v;
   }
 }
 
-alekseev::IntArray::IntArray(const IntArray &rhs) : size(rhs.get_size()),
-                                                    data(new int[size])
+
+alekseev::IntArray::IntArray(const IntArray & rhs): size(rhs.get_size()),
+                                                    data(new int[get_size()])
 {
   for (size_t i = 0; i < size; ++i) {
     data[i] = rhs.data[i];
   }
 }
 
+
 alekseev::IntArray::~IntArray()
 {
   delete[] data;
 }
+
 
 alekseev::IntArray & alekseev::IntArray::operator=(IntArray const & rhs)
 {
@@ -68,19 +73,24 @@ alekseev::IntArray & alekseev::IntArray::operator=(IntArray const & rhs)
   return *this;
 }
 
-size_t alekseev::IntArray::get_size() const
+
+// update from here
+
+size_t alekseev::IntArray::get_size() const noexcept
 {
   return size;
 }
 
-bool alekseev::IntArray::empty() const
+
+bool alekseev::IntArray::empty() const noexcept
 {
   return size == 0;
 }
 
+
 void alekseev::IntArray::add_front(int i)
 {
-  alekseev::IntArray temp = *this;
+  IntArray temp = *this;
   delete[] data;
   size++;
   data = new int[size];
@@ -88,12 +98,12 @@ void alekseev::IntArray::add_front(int i)
   for (size_t j = 1ull; j < size; ++j) {
     data[j] = temp.data[j - 1];
   }
-
 }
+
 
 void alekseev::IntArray::add_back(int i)
 {
-  alekseev::IntArray temp = *this;
+  IntArray temp = *this;
   delete[] data;
   size++;
   data = new int[size];
@@ -103,25 +113,26 @@ void alekseev::IntArray::add_back(int i)
   }
 }
 
+
 void alekseev::IntArray::insert(size_t id, int i)
 {
   if (id > size) {
     throw std::out_of_range("id out of range");
   }
-  alekseev::IntArray temp = *this;
+  IntArray temp = *this;
   delete[] data;
   size++;
   data = new int[size];
   for (size_t j = 0ull; j < size; ++j) {
     if (j == id) {
       data[j] = i;
-    }
-    else {
+    } else {
       size_t true_j = j < id ? j : j - 1;
       data[j] = temp.data[true_j];
     }
   }
 }
+
 
 int alekseev::IntArray::get(size_t id) const
 {
@@ -131,15 +142,18 @@ int alekseev::IntArray::get(size_t id) const
   return data[id];
 }
 
-int alekseev::IntArray::get_front() const
+
+int alekseev::IntArray::get_front() const noexcept
 {
   return data[0];
 }
 
-int alekseev::IntArray::get_back() const
+
+int alekseev::IntArray::get_back() const noexcept
 {
   return data[size - 1];
 }
+
 
 void alekseev::IntArray::set(size_t id, int i)
 {
@@ -149,9 +163,10 @@ void alekseev::IntArray::set(size_t id, int i)
   data[id] = i;
 }
 
+
 void alekseev::IntArray::del(size_t id)
 {
-  alekseev::IntArray temp = *this;
+  IntArray temp = *this;
   delete[] data;
   size--;
   data = new int[size];
@@ -161,12 +176,14 @@ void alekseev::IntArray::del(size_t id)
   }
 }
 
+
 int alekseev::IntArray::pop_back()
 {
   int res = this->get_back();
   this->del(size - 1);
   return res;
 }
+
 
 int alekseev::IntArray::pop_front()
 {
@@ -175,9 +192,10 @@ int alekseev::IntArray::pop_front()
   return res;
 }
 
-void alekseev::IntArray::add(const alekseev::IntArray & a)
+
+void alekseev::IntArray::add(const IntArray & a)
 {
-  alekseev::IntArray temp = *this;
+  IntArray temp = *this;
   size += a.size;
   delete[] data;
   data = new int[size];
