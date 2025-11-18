@@ -2,30 +2,31 @@
 #include <cstddef>
 #include <iostream>
 
-namespace alekseev {
-  struct IntArray {
-    int * data;
-    size_t size;
-    IntArray();
-    IntArray(size_t k, int v);
-    IntArray(const IntArray & rhs);
-    ~IntArray();
-    IntArray & operator=(IntArray const & rhs);
-    size_t get_size() const noexcept;
-    bool empty() const noexcept;
-    void add_front(int i);
-    void add_back(int i);
-    void insert(size_t id, int i);
-    int get(size_t id) const;
-    int get_front() const;
-    int get_back() const;
-    void set(size_t id, int i);
-    void del(size_t id);
-    int pop_back();
-    int pop_front();
-    void add(const IntArray & a);
-  };
-}
+struct IntArray {
+  int * data;
+  size_t size;
+
+  IntArray(size_t k, int v);
+  ~IntArray();
+  IntArray & operator=(const IntArray & rhs);
+  IntArray(const IntArray & rhs);
+  IntArray(IntArray && rhs) noexcept;
+  IntArray & operator=(IntArray && rhs) noexcept;
+
+  size_t get_size() const noexcept;
+  bool empty() const noexcept;
+  void add_front(int i);
+  void add_back(int i);
+  void insert(const size_t id, int i);
+  int get(const size_t id) const noexcept;
+  int get_front() const noexcept;
+  int get_back() const noexcept;
+  void set(const size_t id, int i) noexcept;
+  void del(const size_t id);
+  int pop_front();
+  int pop_back();
+  void add(const IntArray & a);
+};
 
 
 int main()
@@ -33,14 +34,8 @@ int main()
 }
 
 
-alekseev::IntArray::IntArray(): data(nullptr),
-                                size(0)
-{
-}
-
-
-alekseev::IntArray::IntArray(size_t k, int v): size(k),
-                                               data(new int[k])
+IntArray::IntArray(size_t k, int v): size(k),
+                                     data(new int[k])
 {
   for (size_t i = 0ull; i < size; ++i) {
     data[i] = v;
@@ -48,22 +43,13 @@ alekseev::IntArray::IntArray(size_t k, int v): size(k),
 }
 
 
-alekseev::IntArray::IntArray(const IntArray & rhs): size(rhs.get_size()),
-                                                    data(new int[get_size()])
-{
-  for (size_t i = 0; i < size; ++i) {
-    data[i] = rhs.data[i];
-  }
-}
-
-
-alekseev::IntArray::~IntArray()
+IntArray::~IntArray()
 {
   delete[] data;
 }
 
 
-alekseev::IntArray & alekseev::IntArray::operator=(IntArray const & rhs)
+IntArray & IntArray::operator=(IntArray const & rhs)
 {
   if (this != &rhs) {
     size = rhs.size;
@@ -76,143 +62,147 @@ alekseev::IntArray & alekseev::IntArray::operator=(IntArray const & rhs)
   return *this;
 }
 
-size_t alekseev::IntArray::get_size() const noexcept
+IntArray::IntArray(const IntArray & rhs): size(rhs.get_size()),
+                                          data(new int[get_size()])
+{
+  for (size_t i = 0; i < size; ++i) {
+    data[i] = rhs.data[i];
+  }
+}
+
+
+IntArray::IntArray(IntArray && rhs) noexcept: data(rhs.data),
+                                              size(rhs.get_size())
+{
+  rhs.data = nullptr;
+}
+
+IntArray & IntArray::operator=(IntArray && rhs) noexcept
+{
+  if (this != &rhs) {
+    delete[] data;
+    data = rhs.data;
+    size = rhs.get_size();
+    rhs.data = nullptr;
+  }
+  return *this;
+}
+
+size_t IntArray::get_size() const noexcept
 {
   return size;
 }
 
 
-bool alekseev::IntArray::empty() const noexcept
+bool IntArray::empty() const noexcept
 {
   return size == 0;
 }
 
 
-void alekseev::IntArray::add_front(int i)
+void IntArray::add_front(int i)
 {
-  IntArray temp = *this;
-  delete[] data;
-  size++;
-  data = new int[size];
-  data[0] = i;
-  for (size_t j = 1ull; j < size; ++j) {
-    data[j] = temp.data[j - 1];
+  int * temp = new int[size + 1];
+  temp[0] = i;
+  for (size_t j = 1ull; j < size + 1; ++j) {
+    temp[j] = data[j - 1];
   }
+  delete[] data;
+  data = temp;
+  ++size;
 }
 
 
-void alekseev::IntArray::add_back(int i)
+void IntArray::add_back(int i)
 {
-  IntArray temp = *this;
-  delete[] data;
-  size++;
-  data = new int[size];
-  for (size_t j = 0ull; j < size - 1; ++j) {
-    data[j] = temp.data[j];
-  }
-  data[size - 1] = i;
-}
-
-
-void alekseev::IntArray::insert(size_t id, int i)
-{
-  if (id > size) {
-    throw std::out_of_range("id out of range");
-  }
-  IntArray temp = *this;
-  delete[] data;
-  size++;
-  data = new int[size];
+  int * temp = new int[size + 1];
   for (size_t j = 0ull; j < size; ++j) {
-    if (j == id) {
-      data[j] = i;
-    } else {
-      size_t true_j = j < id ? j : j - 1;
-      data[j] = temp.data[true_j];
-    }
+    temp[j] = data[j];
   }
+  temp[size] = i;
+  delete[] data;
+  data = temp;
+  ++size;
 }
 
 
-int alekseev::IntArray::get(size_t id) const
+void IntArray::insert(const size_t id, int i)
 {
-  if (id >= size) {
-    throw std::out_of_range("id out of range");
+  int * temp = new int[size + 1];
+  for (size_t j = 0ull; j < size; ++j) {
+    size_t new_j = j < id ? j : j + 1;
+    temp[new_j] = data[j];
   }
+  temp[id] = i;
+  delete[] data;
+  data = temp;
+  ++size;
+}
+
+
+int IntArray::get(const size_t id) const noexcept
+{
   return data[id];
 }
 
 
-int alekseev::IntArray::get_front() const
+int IntArray::get_front() const noexcept
 {
-  if (size == 0) {
-    throw std::out_of_range("empty array");
-  }
   return data[0];
 }
 
 
-int alekseev::IntArray::get_back() const
+int IntArray::get_back() const noexcept
 {
-  if (size == 0) {
-    throw std::out_of_range("empty array");
-  }
   return data[size - 1];
 }
 
 
-void alekseev::IntArray::set(size_t id, int i)
+void IntArray::set(const size_t id, int i) noexcept
 {
-  if (id >= size) {
-    throw std::out_of_range("id out of range");
-  }
   data[id] = i;
 }
 
 
-void alekseev::IntArray::del(size_t id)
+void IntArray::del(const size_t id)
 {
-  if (id >= size) {
-    throw std::out_of_range("id out of range");
-  }
-  IntArray temp = *this;
-  delete[] data;
-  size--;
-  data = new int[size];
+  int * temp = new int[size - 1];
   for (size_t j = 0ull; j < size; ++j) {
-    size_t true_j = j < id ? j : j + 1;
-    data[j] = temp.data[true_j];
+    size_t new_j = j < id ? j : j - 1;
+    temp[new_j] = data[j];
   }
+  delete[] data;
+  data = temp;
+  --size;
 }
 
-
-int alekseev::IntArray::pop_back()
+int IntArray::pop_front()
 {
-  int res = this->get_back();
-  this->del(size - 1);
+  int res = get_front();
+  del(0);
   return res;
 }
 
 
-int alekseev::IntArray::pop_front()
+int IntArray::pop_back()
 {
-  int res = this->get_front();
-  this->del(0);
+  int res = get_back();
+  del(size - 1);
   return res;
 }
 
 
-void alekseev::IntArray::add(const IntArray & a)
+void IntArray::add(const IntArray & a)
 {
-  IntArray temp = *this;
-  size += a.size;
-  delete[] data;
-  data = new int[size];
-  for (size_t j = 0ull; j < size; ++j) {
-    if (j < temp.size) {
-      data[j] = temp.data[j];
+  int * temp = new int[size + a.get_size()];
+  for (size_t j = 0ull; j < size + a.get_size(); ++j) {
+    if (j < size) {
+      temp[j] = data[j];
     } else {
-      data[j] = a.data[j - temp.size];
+      temp[j] = a.data[j - size];
     }
   }
+  delete[] data;
+  data = temp;
+  size += a.get_size();
 }
