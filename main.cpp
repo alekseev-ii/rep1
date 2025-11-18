@@ -31,25 +31,22 @@ int main()
 
 }
 
-alekseev::IntArray::IntArray()
+alekseev::IntArray::IntArray() : data(nullptr),
+                                 size(0)
 {
-  data = nullptr;
-  size = 0;
 }
 
-alekseev::IntArray::IntArray(size_t k, int v)
+alekseev::IntArray::IntArray(size_t k, int v) : size(k),
+                                                data(new int[get_size()])
 {
-  size = k;
-  data = new int[size];
   for (size_t i = 0ull; i < size; ++i) {
     data[i] = v;
   }
 }
 
-alekseev::IntArray::IntArray(const IntArray & rhs)
+alekseev::IntArray::IntArray(const IntArray &rhs) : size(rhs.get_size()),
+                                                    data(new int[size])
 {
-  size = rhs.size;
-  data = new int[size];
   for (size_t i = 0; i < size; ++i) {
     data[i] = rhs.data[i];
   }
@@ -60,13 +57,13 @@ alekseev::IntArray::~IntArray()
   delete[] data;
 }
 
-alekseev::IntArray & alekseev::IntArray::operator=(alekseev::IntArray const & rhs)
+alekseev::IntArray & alekseev::IntArray::operator=(IntArray const & rhs)
 {
-  size = rhs.size;
+  size = rhs.get_size();
   delete[] data;
-  data = new int[size];
-  for (size_t i = 0ull; i < size; ++i) {
-    data[i] = rhs.data[i];
+  data = new int[get_size()];
+  for (size_t i = 0ull; i < get_size(); ++i) {
+    data[i] = rhs.get(i);
   }
   return *this;
 }
