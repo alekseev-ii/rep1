@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <cstddef>
 #include <iostream>
 
@@ -16,8 +17,8 @@ namespace alekseev {
     void add_back(int i);
     void insert(size_t id, int i);
     int get(size_t id) const;
-    int get_front() const noexcept;
-    int get_back() const noexcept;
+    int get_front() const;
+    int get_back() const;
     void set(size_t id, int i);
     void del(size_t id);
     int pop_back();
@@ -39,7 +40,7 @@ alekseev::IntArray::IntArray(): data(nullptr),
 
 
 alekseev::IntArray::IntArray(size_t k, int v): size(k),
-                                               data(new int[get_size()])
+                                               data(new int[k])
 {
   for (size_t i = 0ull; i < size; ++i) {
     data[i] = v;
@@ -64,17 +65,16 @@ alekseev::IntArray::~IntArray()
 
 alekseev::IntArray & alekseev::IntArray::operator=(IntArray const & rhs)
 {
-  size = rhs.get_size();
-  delete[] data;
-  data = new int[get_size()];
-  for (size_t i = 0ull; i < get_size(); ++i) {
-    data[i] = rhs.get(i);
+  if (this != &rhs) {
+    size = rhs.size;
+    delete[] data;
+    data = new int[size];
+    for (size_t i = 0ull; i < size; ++i) {
+      data[i] = rhs.data[i];
+    }
   }
   return *this;
 }
-
-
-// update from here
 
 size_t alekseev::IntArray::get_size() const noexcept
 {
@@ -107,10 +107,10 @@ void alekseev::IntArray::add_back(int i)
   delete[] data;
   size++;
   data = new int[size];
-  data[size - 1] = i;
   for (size_t j = 0ull; j < size - 1; ++j) {
     data[j] = temp.data[j];
   }
+  data[size - 1] = i;
 }
 
 
@@ -143,14 +143,20 @@ int alekseev::IntArray::get(size_t id) const
 }
 
 
-int alekseev::IntArray::get_front() const noexcept
+int alekseev::IntArray::get_front() const
 {
+  if (size == 0) {
+    throw std::out_of_range("empty array");
+  }
   return data[0];
 }
 
 
-int alekseev::IntArray::get_back() const noexcept
+int alekseev::IntArray::get_back() const
 {
+  if (size == 0) {
+    throw std::out_of_range("empty array");
+  }
   return data[size - 1];
 }
 
@@ -166,6 +172,9 @@ void alekseev::IntArray::set(size_t id, int i)
 
 void alekseev::IntArray::del(size_t id)
 {
+  if (id >= size) {
+    throw std::out_of_range("id out of range");
+  }
   IntArray temp = *this;
   delete[] data;
   size--;
