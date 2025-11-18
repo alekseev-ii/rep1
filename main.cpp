@@ -7,6 +7,7 @@ namespace alekseev {
     size_t size;
     IntArray();
     IntArray(size_t k, int v);
+    IntArray(const IntArray & rhs);
     ~IntArray();
     IntArray & operator=(IntArray const & rhs);
     size_t get_size() const;
@@ -45,6 +46,15 @@ alekseev::IntArray::IntArray(size_t k, int v)
   }
 }
 
+alekseev::IntArray::IntArray(const IntArray & rhs)
+{
+  size = rhs.size;
+  data = new int[size];
+  for (size_t i = 0; i < size; ++i) {
+    data[i] = rhs.data[i];
+  }
+}
+
 alekseev::IntArray::~IntArray()
 {
   delete[] data;
@@ -79,7 +89,7 @@ void alekseev::IntArray::add_front(int i)
   data = new int[size];
   data[0] = i;
   for (size_t j = 1ull; j < size; ++j) {
-    data[j] = temp.data[j];
+    data[j] = temp.data[j - 1];
   }
 
 }
@@ -98,7 +108,7 @@ void alekseev::IntArray::add_back(int i)
 
 void alekseev::IntArray::insert(size_t id, int i)
 {
-  if (id > size || id < 0) {
+  if (id > size) {
     throw std::out_of_range("id out of range");
   }
   alekseev::IntArray temp = *this;
@@ -110,7 +120,7 @@ void alekseev::IntArray::insert(size_t id, int i)
       data[j] = i;
     }
     else {
-      size_t true_j = j ? j < id : j + 1;
+      size_t true_j = j < id ? j : j - 1;
       data[j] = temp.data[true_j];
     }
   }
@@ -118,7 +128,7 @@ void alekseev::IntArray::insert(size_t id, int i)
 
 int alekseev::IntArray::get(size_t id) const
 {
-  if (id >= size || id < 0) {
+  if (id >= size) {
     throw std::out_of_range("id out of range");
   }
   return data[id];
@@ -136,7 +146,7 @@ int alekseev::IntArray::get_back() const
 
 void alekseev::IntArray::set(size_t id, int i)
 {
-  if (id >= size || id < 0) {
+  if (id >= size) {
     throw std::out_of_range("id out of range");
   }
   data[id] = i;
@@ -149,7 +159,7 @@ void alekseev::IntArray::del(size_t id)
   size--;
   data = new int[size];
   for (size_t j = 0ull; j < size; ++j) {
-    size_t true_j = j ? j < id : j + 1;
+    size_t true_j = j < id ? j : j + 1;
     data[j] = temp.data[true_j];
   }
 }
@@ -178,7 +188,7 @@ void alekseev::IntArray::add(const alekseev::IntArray & a)
     if (j < temp.size) {
       data[j] = temp.data[j];
     } else {
-      data[j] = a.data[j];
+      data[j] = a.data[j - temp.size];
     }
   }
 }
