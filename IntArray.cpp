@@ -2,33 +2,12 @@
 
 #include <stdexcept>
 
-IntArray::IntArray(size_t k, int v): size(k),
-                                     data(new int[k])
-{
-  for (size_t i = 0ull; i < size; ++i) {
-    data[i] = v;
-  }
-}
-
 
 IntArray::~IntArray()
 {
   delete[] data;
 }
 
-
-IntArray & IntArray::operator=(IntArray const & rhs)
-{
-  if (this != &rhs) {
-    size = rhs.size;
-    delete[] data;
-    data = new int[size];
-    for (size_t i = 0ull; i < size; ++i) {
-      data[i] = rhs.data[i];
-    }
-  }
-  return *this;
-}
 
 IntArray::IntArray(const IntArray & rhs): size(rhs.get_size()),
                                           data(new int[get_size()])
@@ -39,11 +18,27 @@ IntArray::IntArray(const IntArray & rhs): size(rhs.get_size()),
 }
 
 
+IntArray & IntArray::operator=(IntArray const & rhs)
+{
+  if (this != &rhs) {
+    int * temp = new int[rhs.get_size()];
+    size = rhs.get_size();
+    delete[] data;
+    data = temp;
+    for (size_t i = 0ull; i < size; ++i) {
+      data[i] = rhs.data[i];
+    }
+  }
+  return *this;
+}
+
+
 IntArray::IntArray(IntArray && rhs) noexcept: data(rhs.data),
                                               size(rhs.get_size())
 {
   rhs.data = nullptr;
 }
+
 
 IntArray & IntArray::operator=(IntArray && rhs) noexcept
 {
@@ -55,6 +50,21 @@ IntArray & IntArray::operator=(IntArray && rhs) noexcept
   }
   return *this;
 }
+
+
+IntArray::IntArray(): data(nullptr), size(0ull)
+{
+}
+
+
+IntArray::IntArray(size_t k, int v): size(k),
+                                     data(new int[k])
+{
+  for (size_t i = 0ull; i < size; ++i) {
+    data[i] = v;
+  }
+}
+
 
 size_t IntArray::get_size() const noexcept
 {
@@ -143,6 +153,7 @@ void IntArray::del(const size_t id)
   data = temp;
   --size;
 }
+
 
 int IntArray::pop_front()
 {
