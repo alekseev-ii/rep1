@@ -159,11 +159,6 @@ void IntMatrix::insert_column(const size_t col, int value)
         temp.set(i * (cols() + 1) + j, get(i, j - 1));
       }
     }
-    // print(std::cout);
-    // for (size_t k = 0; k < temp.get_size(); ++k) {
-    //   std::cout << temp.get(k) << " ";
-    // }
-    // std::cout << "\n";
   }
   c++;
   data = temp;
@@ -174,5 +169,3 @@ void IntMatrix::insert_column(const size_t col)
 {
   insert_column(col, 0);
 }
-
-
