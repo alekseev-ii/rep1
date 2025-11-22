@@ -25,6 +25,9 @@ struct IntMatrix {
   void read(std::istream & input);
   void print(std::ostream & output) const noexcept;
   void insert_row(const size_t row, int value);
+  void insert_row(const size_t row);
+  void insert_column(const size_t col, int value);
+  void insert_column(const size_t col);
 };
 
 #endif

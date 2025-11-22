@@ -119,3 +119,60 @@ void IntMatrix::print(std::ostream & output) const noexcept
     output << "\n";
   }
 }
+
+
+void IntMatrix::insert_row(const size_t row, int value)
+{
+  IntArray temp = IntArray((rows() + 1) * cols(), 0);
+  for (size_t i = 0; i < rows() + 1; ++i) {
+    for (size_t j = 0; j < cols(); ++j) {
+      if (i < row) {
+        temp.set(i * cols() + j, get(i, j));
+      } else if (i == row) {
+        temp.set(i * cols() + j, value);
+      } else if (i > row) {
+        temp.set(i * cols() + j, get(i - 1, j));
+      }
+    }
+  }
+  r++;
+  data = temp;
+}
+
+
+void IntMatrix::insert_row(const size_t row)
+{
+  insert_row(row, 0);
+}
+
+
+void IntMatrix::insert_column(const size_t col, int value)
+{
+  IntArray temp = IntArray(rows() * (cols() + 1), 0);
+  for (size_t i = 0; i < rows(); ++i) {
+    for (size_t j = 0; j < cols() + 1; ++j) {
+      if (j < col) {
+        temp.set(i * (cols() + 1) + j, get(i, j));
+      } else if (j == col) {
+        temp.set(i * (cols() + 1) + j, value);
+      } else if (j > col) {
+        temp.set(i * (cols() + 1) + j, get(i, j - 1));
+      }
+    }
+    // print(std::cout);
+    // for (size_t k = 0; k < temp.get_size(); ++k) {
+    //   std::cout << temp.get(k) << " ";
+    // }
+    // std::cout << "\n";
+  }
+  c++;
+  data = temp;
+}
+
+
+void IntMatrix::insert_column(const size_t col)
+{
+  insert_column(col, 0);
+}
+
+
