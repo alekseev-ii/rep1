@@ -2,6 +2,7 @@
 #define INTMATRIX_H
 #include <cstddef>
 #include "IntArray.h"
+#include <iostream>
 
 struct IntMatrix {
   size_t r;
@@ -19,7 +20,11 @@ struct IntMatrix {
 
   size_t rows() const noexcept;
   size_t cols() const noexcept;
-  int get (size_t i, size_t j) const noexcept;
+  int get(const size_t i, const size_t j) const noexcept;
+  void set(const size_t i, const size_t j, int value) noexcept;
+  void read(std::istream & input);
+  void print(std::ostream & output) const noexcept;
+  void insert_row(const size_t row, int value);
 };
 
 #endif
